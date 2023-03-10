@@ -41,7 +41,8 @@ jobs:
         draft: false
         prerelease: false
         release_name: ${{ steps.generate_release_name.outputs.name }}
-        tag_name: ${{ github.ref }}
+        tag_name: v1.0
+        body: Generated docset
       env:
         GITHUB_TOKEN: ${{ github.token }}
     
