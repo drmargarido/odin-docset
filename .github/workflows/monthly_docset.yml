@@ -1,0 +1,56 @@
+name: Monthly Docset
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 1 1 * *
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    
+    - name: Install Dependencies
+      run: sudo apt-get install -y zip
+    
+    - name: Install BeautifulSoup
+      run: pip3 install bs4
+    
+    - name: Install xml parsing library
+      run: pip3 install lxml
+    
+    - name: Download Packages Docs
+      run: bash download_pkgs_docs.sh
+    
+    - name: Generate Docset
+      run: python3 generate_odin_docset.py
+    
+    - name: Create zipped file
+      run: zip -r Odin.docset.zip Odin.docset
+    
+    - name: Create Release Name
+      id: generate_release_name
+      run: echo "name=$(date '+%Y-%m')" >> "$GITHUB_OUTPUT"
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: ${{ steps.generate_release_name.outputs.name }}
+        tag_name: ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    
+    - name: Upload Docset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./Odin.docset.zip
+        asset_name: Odin.docset.zip
+        asset_content_type: application/gzip
