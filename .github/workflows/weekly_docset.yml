@@ -13,6 +13,8 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install Dependencies
       run: sudo apt-get install -y zip
+    - name: Install Python Dependencies
+      run: pip3 install bs4
     - name: Download Packages Docs
       run: bash download_pkgs_docs.sh
     - name: Generate Docset
