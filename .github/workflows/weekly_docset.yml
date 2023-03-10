@@ -13,8 +13,10 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install Dependencies
       run: sudo apt-get install -y zip
-    - name: Install Python Dependencies
+    - name: Install BeautifulSoup
       run: pip3 install bs4
+    - name: Install xml parsing library
+      run: pip3 install lxml
     - name: Download Packages Docs
       run: bash download_pkgs_docs.sh
     - name: Generate Docset
