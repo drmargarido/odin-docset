@@ -1,0 +1,23 @@
+name: Weekly Docset
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 1 * * 6
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Dependencies
+      run: sudo apt-get install -y zip
+    - name: Download Packages Docs
+      run: bash download_pkgs_docs.sh
+    - name: Generate Docset
+      run: python3 generate_odin_docset.py
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Odin.docset
+        path: Odin.docset
