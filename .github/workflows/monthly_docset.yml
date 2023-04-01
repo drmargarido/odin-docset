@@ -42,7 +42,7 @@ jobs:
         draft: false
         prerelease: false
         release_name: ${{ steps.generate_release_name.outputs.name }}
-        tag_name: v1.0
+        tag_name: ${{ steps.generate_release_name.outputs.name }}
         body: Generated docset
       env:
         GITHUB_TOKEN: ${{ github.token }}
