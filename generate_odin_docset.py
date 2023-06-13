@@ -25,13 +25,20 @@ cur.execute("CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);")
 docpath = "Odin.docset/Contents/Resources/Documents"
 
 def parse_packages(top_level_soup):
-    for pkg in top_level_soup.find_all("td", {"class": "pkg-name"}):
+    current_directory = None
+    for parent_pkg in top_level_soup.find_all("tr", {"class": "directory-pkg"}):
+        pkg = parent_pkg.find("td", {"class": "pkg-name"})
         name = pkg.text.strip()
+        if "directory-child" in parent_pkg["class"]:
+            name = "{0}/{1}".format(current_directory, name)
+        else:
+            current_directory = name
+
         if not pkg.a:
             continue
 
         pkg_href = pkg.a.attrs["href"]
-        if len(name) > 1:
+        if len(name) >= 1:
             cur.execute("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?,?,?)", (name, "Package", pkg_href))
             print("package: %s, path: %s" % (name, pkg_href))
 
@@ -39,12 +46,12 @@ def parse_packages(top_level_soup):
             pkg_soup = BeautifulSoup(pkg_page, features="lxml")
 
             current_type = ""
-            for node in pkg_soup.find("article", {"class": "documentation"}):
+            for node in pkg_soup.find("section", {"class": "documentation"}):
                 if node.name == "h2":
                     entity_type = node.attrs.get("id", "")
                     current_type = entity_to_type.get(entity_type, "")
 
-                if node.name == "section":
+                if node.name == "div":
                     if current_type == "":
                         continue
 
