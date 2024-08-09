@@ -69,5 +69,10 @@ page = open(os.path.join(docpath,"vendor.html")).read()
 soup = BeautifulSoup(page, features="lxml")
 parse_packages(soup)
 
+page = open(os.path.join(docpath,"base.html")).read()
+soup = BeautifulSoup(page, features="lxml")
+parse_packages(soup)
+
+
 conn.commit()
 conn.close()
