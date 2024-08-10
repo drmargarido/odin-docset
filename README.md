@@ -7,7 +7,7 @@ Odin docset generation for the odin pkgs to be used in Zeal / Dash / Velocity
 2. Copy the Odin.docset folder to your Zeal / Dash / Velocity docsets folder.
 3. All done, it's ready to use!
 
-## Steps to generate the manually
+## Steps to generate the docset manually
 
 First download the most recent docs for the packages
 ```sh
