@@ -22,7 +22,7 @@ except:
 cur.execute("CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);")
 cur.execute("CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);")
 
-docpath = "Odin.docset/Contents/Resources/Documents"
+main_path = "Odin.docset/Contents/Resources/Documents/pkg.odin-lang.org"
 
 def parse_packages(top_level_soup):
     current_directory = None
@@ -37,11 +37,16 @@ def parse_packages(top_level_soup):
         if not pkg.a:
             continue
 
+        path_arr = docpath.split('/')
+        search_path = path_arr[len(path_arr) - 1]
         pkg_href = pkg.a.attrs["href"]
+        # pkg_href =
+        print("[+] PKG Href: ", pkg_href)
         if len(name) >= 1:
-            cur.execute("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?,?,?)", (name, "Package", pkg_href))
-            print("package: %s, path: %s" % (name, pkg_href))
-
+            cur.execute("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?,?,?)", (name, "Package", "pkg.odin-lang.org/{0}/{1}".format(search_path, pkg_href)))
+            print("package: %s, path: %s" % (name, os.path.join(docpath, pkg_href)))
+            # print("docpath: ", search_path)
+            # exit(1)
             pkg_page = open(os.path.join(docpath, pkg_href)).read()
             pkg_soup = BeautifulSoup(pkg_page, features="lxml")
 
@@ -57,19 +62,26 @@ def parse_packages(top_level_soup):
 
                     for entity in node.find_all("h3"):
                         entity_name = entity.attrs["id"]
-                        entity_href = "{0}#{1}".format(pkg_href, entity_name)
+                        entity_href = "pkg.odin-lang.org/{0}/{1}#{2}".format(search_path,pkg_href, entity_name)
+                        # pkg.odin-lang.org/core/{pkg_href}
+                        print("[+] Entity Href: ", entity_href)
                         prefixed_entity_name = "{0}.{1}".format(name, entity_name)
+                        print(f"[+] Entity href: {entity_href}")
+                        # exit(1)
                         cur.execute("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?,?,?)", (prefixed_entity_name, current_type, entity_href))
 
-page = open(os.path.join(docpath,"core.html")).read()
+docpath = main_path + "/core"
+page = open(os.path.join(docpath,"index.html")).read()
 soup = BeautifulSoup(page, features="lxml")
 parse_packages(soup)
 
-page = open(os.path.join(docpath,"vendor.html")).read()
+docpath = main_path + "/vendor"
+page = open(os.path.join(docpath,"index.html")).read()
 soup = BeautifulSoup(page, features="lxml")
 parse_packages(soup)
 
-page = open(os.path.join(docpath,"base.html")).read()
+docpath = main_path + "/base"
+page = open(os.path.join(docpath,"index.html")).read()
 soup = BeautifulSoup(page, features="lxml")
 parse_packages(soup)
 
