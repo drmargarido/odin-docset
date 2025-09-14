@@ -8,6 +8,7 @@ if [ ! -d ./Odin.docset/Contents/Resources/Documents ]; then
     elif [ "$SHELL" == "/usr/bin/fish" ] || [ "$SHELL" == "/bin/fish" ]; then
         source .venv/bin/activate.fish
     fi
+    pip install beautifulsoup4 lxml
     python ./generate_odin_docset.py
 else
     httrack --update
